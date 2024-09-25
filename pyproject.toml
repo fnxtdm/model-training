@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=70.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["ml_training"]
+
+[project]
+name = "ml_training"
+authors = [{name = "Dell"}]
+readme = "README.md"
+version = "1.0"
+requires-python = ">3.8"
+description = "A python package to simplify the creation of machine learning models"
+
+dependencies = [
+    "torch==2.4.0+cu124",
+    "torchaudio==2.4.0+cu124",
+    "torchvision==0.19.0+cu124",
+    "nvidia-cuda-cupti-cu12==12.6.37",
+    "nvidia-cuda-nvrtc-cu12==12.6.20",
+    "nvidia-cuda-runtime-cu12==12.6.37",
+    "pytest",
+    "pytest-cov",
+    "pre-commit"
+]
+
+[project.optional-dependencies]
+data_prep = [
+    "virtualenv==20.26.3",
+    "vncdotool==1.2.0",
+    "img2dataset",
+    "labelme==5.5.0"
+]
+
+[tool.isort]
+profile = "black"
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "NUMERIC", "FIRSTPARTY", "LOCALFOLDER"]
+known_numeric = ["torch", "torchvision", "numpy", "jax", "flax" ]
+
+
+[tool.pytest.ini_options]
+addopts = "--cov=ml_training"
+markers = [
+    "gpu" # tests that require a gpu
+]
