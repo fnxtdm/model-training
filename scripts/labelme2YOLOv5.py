@@ -1,7 +1,10 @@
 import os
+import sys
 import json
 import glob
 from PIL import Image
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.config import json_dir, output_img_dir, output_label_dir
 
 # Create output directories

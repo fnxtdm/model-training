@@ -2,6 +2,8 @@
 import os
 import sys
 import subprocess
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from utils.config import tmp_dir, image_dir
 
 # set WANDB_DISABLED=true
