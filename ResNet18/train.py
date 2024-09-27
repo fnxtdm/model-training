@@ -1,23 +1,10 @@
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader
 import torch.nn as nn
-import torchvision.models as models
 from torchvision import transforms
-from models.ResNet18.labelme_dataset import LabelMeDataset
-
-# 定义ResNet18模型，用于多标签分类
-class ResNet18MultiLabel(nn.Module):
-    def __init__(self, num_classes=10, pretrained=True):
-        super(ResNet18MultiLabel, self).__init__()
-        self.resnet = models.resnet18(pretrained=pretrained)
-        # 修改ResNet18的最后一层为多标签分类输出
-        self.resnet.fc = nn.Linear(self.resnet.fc.in_features, num_classes)
-        self.sigmoid = nn.Sigmoid()
-
-    def forward(self, x):
-        x = self.resnet(x)
-        x = self.sigmoid(x)
-        return x
+from resnet18_multilabel import ResNet18MultiLabel
+from labelme_dataset import LabelMeDataset
+from utils.config import device, model_path, json_dir, image_dir
 
 # 数据增强和预处理
 transform = transforms.Compose([
@@ -26,18 +13,9 @@ transform = transforms.Compose([
 ])
 
 # 超参数设置
-json_dir = '../../data/labelme'  # JSON文件夹路径
-image_dir = '../../data/labelme'  # 图像文件夹路径
 batch_size = 8
-num_epochs = 500
+num_epochs = 50
 learning_rate = 0.001
-
-# CUDA可用性检查
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-if torch.cuda.is_available():
-    print("CUDA is available! Training on GPU.")
-else:
-    print("CUDA is not available. Training on CPU.")
 
 # 加载数据集和数据加载器
 dataset = LabelMeDataset(json_dir=json_dir, image_dir=image_dir, transform=transform)
@@ -68,7 +46,7 @@ for epoch in range(num_epochs):
     avg_loss = running_loss / len(dataloader)
     print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}')
 
-torch.save(model.state_dict(), 'resnet_model.pth')
+torch.save(model.state_dict(), f'{model_path}')
 
 # 评估模型
 def evaluate(model, dataloader):
@@ -76,6 +54,8 @@ def evaluate(model, dataloader):
     total_loss = 0
     with torch.no_grad():
         for images, labels in dataloader:
+            images, labels = images.to(device), labels.to(device)
+
             outputs = model(images)
             loss = criterion(outputs, labels)
             total_loss += loss.item()
