@@ -40,7 +40,7 @@ if __name__ == "__main__":
     run_python_file('../YOLOv5/train.py',
                     '--img', '640',
                     '--batch', '1',
-                    '--epochs', '100',
+                    '--epochs', '5000',
                     '--data', '../data/thinos9.yaml',
                     '--weights', 'yolov5x.pt',
                     '--exist-ok'
